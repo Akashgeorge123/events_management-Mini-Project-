@@ -39,9 +39,13 @@ $student_id = $_SESSION['user_id'];
         unset($_SESSION['msg']);
     }
 
-    // Fetch events
-    $events = $conn->query("SELECT * FROM events ORDER BY date, time");
-    if($events->num_rows > 0){
+    // Fetch events safely
+    $query = "SELECT * FROM events ORDER BY date, time";
+    $events = $conn->query($query);
+
+    if(!$events){
+        echo "<p style='color:red; text-align:center;'>Error fetching events: ".$conn->error."</p>";
+    } elseif($events->num_rows > 0){
         while($event = $events->fetch_assoc()){
             echo "<div class='event'>";
 
@@ -49,17 +53,17 @@ $student_id = $_SESSION['user_id'];
             if(!empty($event['image'])){
                 echo "<img src='../uploads/".$event['image']."' alt='Event Image' style='max-width:200px; display:block; margin-bottom:10px;'>";
             } else {
-                echo "<img src='../uploads/placeholder.jpg' alt='No Image' style='max-width:200px; display:block; margin-bottom:10px;'>";
+                echo "<img src='../images/image3.jpg' alt='No Image' style='max-width:200px; display:block; margin-bottom:10px;'>";
             }
 
-            echo "<h3>".$event['title']."</h3>";
-            echo "<p>".$event['description']."</p>";
+            echo "<h3>".htmlspecialchars($event['title'])."</h3>";
+            echo "<p>".htmlspecialchars($event['description'])."</p>";
             echo "<p><b>Date:</b> ".$event['date']." | <b>Time:</b> ".$event['time']."</p>";
-            echo "<p><b>Location:</b> ".$event['location']."</p>";
+            echo "<p><b>Location:</b> ".htmlspecialchars($event['location'])."</p>";
 
             // Check if student registered
             $check = $conn->query("SELECT * FROM registrations WHERE student_id=$student_id AND event_id=".$event['id']);
-            if($check->num_rows > 0){
+            if($check && $check->num_rows > 0){
                 $reg = $check->fetch_assoc();
                 echo "<p>Payment Status: ".($reg['paid']=='yes' ? 'Paid' : 'Not Paid')."</p>";
                 echo "<a href='cancel_registration.php?event_id=".$event['id']."'>Cancel Registration</a>";

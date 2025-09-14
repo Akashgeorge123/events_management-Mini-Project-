@@ -14,14 +14,22 @@ if(isset($_POST['add'])){
     $time = $_POST['time'];
     $location = $_POST['location'];
 
-    $image = null;
+    // Handle image
+    $image = "default.jpg"; // default image if none uploaded
     if(isset($_FILES['image']) && $_FILES['image']['name'] != ''){
         $image = time() . "_" . $_FILES['image']['name'];
         move_uploaded_file($_FILES['image']['tmp_name'], "../uploads/".$image);
     }
 
-    $conn->query("INSERT INTO events (title, description, date, time, location) VALUES ('$title','$description','$date','$time','$location')");
-    $success = "Event added successfully!";
+    // Insert full event into DB
+    $stmt = $conn->prepare("INSERT INTO events (title, description, date, time, location, image) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $title, $description, $date, $time, $location, $image);
+    if($stmt->execute()){
+        $success = "Event added successfully!";
+    } else {
+        $error = "Error: " . $stmt->error;
+    }
+    $stmt->close();
 }
 ?>
 
@@ -44,9 +52,12 @@ if(isset($_POST['add'])){
 <div class="dashboard">
     <h2>Add Event</h2>
 
-    <?php if(isset($success)) echo "<p style='color:green;'>$success</p>"; ?>
+    <?php 
+    if(isset($success)) echo "<p style='color:green;'>$success</p>"; 
+    if(isset($error)) echo "<p style='color:red;'>$error</p>";
+    ?>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <input type="text" name="title" placeholder="Event Title" required><br>
         <textarea name="description" placeholder="Description" required></textarea><br>
         <input type="date" name="date" required><br>
