@@ -6,13 +6,12 @@ include "includes/db.php";
 <html>
 <head>
     <title>Events Management</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css"> <!-- external CSS -->
 </head>
 <body>
 
 <!-- Hero Section -->
 <section class="hero">
-    <img src="images/image1.jpg" alt="Festivals in Kottayam" class="hero-image">
     <div class="hero-content">
         <h1>Upcoming Festivals & Events</h1>
         <p>Experience the rich cultural heritage of our community through vibrant events and festivals.</p>
@@ -29,11 +28,9 @@ include "includes/db.php";
     if($result->num_rows > 0){
         while($row = $result->fetch_assoc()) {
             echo "<div class='event-card'>";
-            // Show image if exists
             if($row['image']){
                 echo "<img src='uploads/".$row['image']."' alt='Event Image'>";
             } else {
-                // Placeholder image if no image
                 echo "<img src='images/image3.jpg' alt='No Image'>";
             }
             echo "<h3>".$row['title']."</h3>";
@@ -43,7 +40,6 @@ include "includes/db.php";
             echo "</div>";
         }
     } else {
-        // Placeholder card if no events
         echo "<div class='event-card no-events'>";
         echo "<p>No upcoming events at the moment. Please check back later.</p>";
         echo "</div>";
@@ -53,7 +49,7 @@ include "includes/db.php";
     </div>
 </section>
 
-<!-- Footer Links -->
+<!-- Footer -->
 <footer>
     <div class="footer-links">
         <a href="login.php">Login</a> | 
